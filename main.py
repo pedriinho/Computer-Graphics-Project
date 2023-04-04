@@ -70,17 +70,17 @@ def keyboard(ch, x, y):
     elif ch == 'Y':
         cy -= 0.5
     elif ch == 'o':
-        if (anglePorta < 90):
-            anglePorta += 1
+        if (anglePorta + 3 < 90):
+            anglePorta += 3
     if ch == 'c':
-        if (anglePorta >= 0):
-            anglePorta -= 1
+        if (anglePorta - 3 >= 0):
+            anglePorta -= 3
     if ch == 'v':
-        angleVent += 5
+        angleVent += 15
         if (angleVent >= 360):
             angleVent = 0
     if ch == 'V':
-        angleVent -= 5
+        angleVent -= 15
         if (angleVent <= 0):
             angleVent = 360 
 
@@ -464,7 +464,23 @@ def montar_teclado():
         x-=1.71
         z = 2.1
 
+def montar_janela_da_porta():
+    global medida
 
+    vertices = [
+        [7.98, 7.18, 3, 2.22, 5.5575],
+        [7.16, 7.02, 3, 2.22, 5.5575],
+        [7.16, 7.02, 2.2, 0, 5.5575],
+    ]
+
+    for janela in vertices:
+        glBegin(GL_QUADS)
+        glColor4f(192,192,192, 0.5) 
+        glVertex3f(janela[0] * medida, janela[3] * medida, janela[4] * medida)
+        glVertex3f(janela[0] * medida, janela[2] * medida, janela[4] * medida)
+        glVertex3f(janela[1] * medida, janela[2] * medida, janela[4] * medida)
+        glVertex3f(janela[1] * medida, janela[3] * medida, janela[4] * medida)
+        glEnd()
 
 def Draw():
     global medida, cx, cy, cz, fx, fy, fz, ux, uy, uz, anglePorta, angleVent, objTeclado
@@ -484,6 +500,12 @@ def Draw():
 
     glPushMatrix()
     montar_teclado()
+    glPopMatrix()
+
+    glPushMatrix()
+    glEnable(GL_BLEND)
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+    montar_janela_da_porta()
     glPopMatrix()
 
     glPushMatrix()  
