@@ -7,7 +7,7 @@ import math
 cx, cy, cz, fx, fy, fz, ux, uy, uz = 4, 10, 3.2, -4.18, -5.97, -3.38, 0, 1, 0
 anglePorta, angleVent, mouseSens, mouseVel, ang_x, ang_y = 0.0, 0.0, 0.001, 0.1, -1.2, 1
 antigo_x, antigo_y, fAspect, rotX, rotY, obsZ, medida = 0, 0, 1.6, 0, -2, 2, 7
-obj = ''
+objTeclado = ''
 
 def square(A, B, C, D):
     glBegin(GL_POLYGON)
@@ -435,8 +435,39 @@ def myInit():
     glFrustum(-1, 1, -1, 1, 1, 100)
     glMatrixMode(GL_MODELVIEW)
 
+def montar_teclado():
+    # lado lideiro
+    x, y, z = 6.2, 0.81, 3.9
+    for linha in range(4):
+        for coluna in range(3):
+            glPushMatrix()
+            glTranslatef(x*medida, y*medida, z*medida)
+            glScale(0.05, 0.05, 0.05)
+            glRotatef(-90, 0, 1, 0)
+            glCallList(objTeclado.gl_list)
+            glPopMatrix()
+            z+=0.9
+        x-=1.71
+        z = 3.9
+
+    # lado esquerdo
+    x, y, z = 6.2, 0.81, 2.1
+    for linha in range(4):
+        for coluna in range(3):
+            glPushMatrix()
+            glTranslatef(x*medida, y*medida, z*medida)
+            glScale(0.05, 0.05, 0.05)
+            glRotatef(-90, 0, 1, 0)
+            glCallList(objTeclado.gl_list)
+            glPopMatrix()
+            z-=0.9
+        x-=1.71
+        z = 2.1
+
+
+
 def Draw():
-    global medida, cx, cy, cz, fx, fy, fz, ux, uy, uz, anglePorta, angleVent, obj
+    global medida, cx, cy, cz, fx, fy, fz, ux, uy, uz, anglePorta, angleVent, objTeclado
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
     glMatrixMode(GL_MODELVIEW)
@@ -450,11 +481,10 @@ def Draw():
     montar_quadro()
     montar_estruturas_da_porta()
     glPopMatrix()
-    
-    # glPushMatrix()
-    # glTranslatef(10, 10, 10)
-    # glCallList(obj.gl_list)
-    # glPopMatrix()
+
+    glPushMatrix()
+    montar_teclado()
+    glPopMatrix()
 
     glPushMatrix()  
     glTranslatef(7.975*medida, 0, 5.585*medida)
@@ -514,7 +544,7 @@ def mouse_camera(mouse_x, mouse_y):
     glutPostRedisplay()
 
 def main():
-    global obj
+    global objTeclado
 
     glutInit()
     glutInitWindowSize(1600, 1000)
@@ -522,7 +552,7 @@ def main():
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH)
     glutCreateWindow("lab 2")
     myInit()
-    obj = OBJ('ObjBlender/teclado.obj')
+    objTeclado = OBJ('ObjBlender/teclado.obj')
     glutDisplayFunc(Draw)
     glutKeyboardFunc(keyboard)
     glutMouseFunc(gerenciaMouse)
