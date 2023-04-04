@@ -3,7 +3,6 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
 import math
-import sys
 
 cx, cy, cz, fx, fy, fz, ux, uy, uz = 4, 10, 3.2, -4.18, -5.97, -3.38, 0, 1, 0
 anglePorta, angleVent, mouseSens, mouseVel, ang_x, ang_y = 0.0, 0.0, 0.001, 0.1, -1.2, 1
