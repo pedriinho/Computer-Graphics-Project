@@ -437,32 +437,32 @@ def myInit():
 
 def montar_teclado():
     # lado lideiro
-    x, y, z = 6.2, 0.81, 3.9
+    x, y, z = 6.2, 0.81, 4.05
     for linha in range(4):
         for coluna in range(3):
             glPushMatrix()
             glTranslatef(x*medida, y*medida, z*medida)
-            glScale(0.05, 0.05, 0.05)
+            glScale(0.4, 0.55, 0.35)
             glRotatef(-90, 0, 1, 0)
             glCallList(objTeclado.gl_list)
             glPopMatrix()
             z+=0.9
         x-=1.71
-        z = 3.9
+        z = 4.05
 
     # lado esquerdo
-    x, y, z = 6.2, 0.81, 2.1
+    x, y, z = 6.2, 0.81, 2.25
     for linha in range(4):
         for coluna in range(3):
             glPushMatrix()
             glTranslatef(x*medida, y*medida, z*medida)
-            glScale(0.05, 0.05, 0.05)
+            glScale(0.4, 0.55, 0.4)
             glRotatef(-90, 0, 1, 0)
             glCallList(objTeclado.gl_list)
             glPopMatrix()
             z-=0.9
         x-=1.71
-        z = 2.1
+        z = 2.25
 
 def montar_janela_da_porta():
     global medida
