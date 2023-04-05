@@ -3,11 +3,13 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
 import math
+import time
 
 cx, cy, cz, fx, fy, fz, ux, uy, uz = 4, 10, 3.2, -4.18, -5.97, -3.38, 0, 1, 0
 anglePorta, angleVent, mouseSens, mouseVel, ang_x, ang_y = 0.0, 0.0, 0.001, 0.1, -1.2, 1
 antigo_x, antigo_y, fAspect, rotX, rotY, obsZ, medida = 0, 0, 1.6, 0, -2, 2, 7
-objTeclado = ''
+objTeclado, objMonitorOn = '', ''
+turnOnPc = []
 
 def square(A, B, C, D):
     glBegin(GL_POLYGON)
@@ -18,6 +20,7 @@ def square(A, B, C, D):
     glEnd()
 
 def cubo(t0, t1, t2, t3, t4, t5, t6, t7, colorR, colorG, colorB):
+    glPushMatrix()
     glColor3f(colorR, colorG, colorB)
     square(t0, t1, t2, t3)
 
@@ -35,6 +38,7 @@ def cubo(t0, t1, t2, t3, t4, t5, t6, t7, colorR, colorG, colorB):
 
     glColor3f(colorR, colorG, colorB)
     square(t0, t1, t5, t4)
+    glPopMatrix()
 
 def modelar_objeto( x_max, x_min,  y_max, y_min,  z_max, z_min, colorR, colorG, colorB):
     global medida
@@ -52,7 +56,7 @@ def modelar_objeto( x_max, x_min,  y_max, y_min,  z_max, z_min, colorR, colorG, 
     cubo(objeto[0], objeto[1], objeto[2], objeto[3], objeto[4], objeto[5], objeto[6], objeto[7], colorR, colorG, colorB)
 
 def keyboard(ch, x, y):
-    global cx, cy, cz, fx, fy, fz, ux, uy, uz, anglePorta, angleVent
+    global cx, cy, cz, fx, fy, fz, ux, uy, uz, anglePorta, angleVent, turnOnPc
     ch = ch.decode("utf-8")
 
     if ch == 'r':
@@ -83,16 +87,26 @@ def keyboard(ch, x, y):
         angleVent -= 15
         if (angleVent <= 0):
             angleVent = 360 
+    if ch == '1':
+        for pc in turnOnPc:
+            pc['state'] = True
+
+    if ch == '0':
+        for pc in turnOnPc:
+            pc['state'] = False
 
     glutPostRedisplay()
 
 def montar_monitores():
+    global turnOnPc
     # base dos monitores do lado direito
     x_max, x_min, y_max, y_min, z_max, z_min = 6.5, 6.35,  0.815, 0.8001,  4.235,  3.985
     while(x_min > 0):
         z_max, z_min = 4.235, 3.985
         while(z_max < 6.4):
+            glPushMatrix()
             modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0, 0, 0)
+            glPopMatrix()
             z_max+=0.9
             z_min+= 0.9
         x_max-=1.71
@@ -103,7 +117,9 @@ def montar_monitores():
     while(x_min > 0):
         z_max, z_min = 4.135, 4.085
         while(z_max < 6.4):
+            glPushMatrix()
             modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.2, 0.2, 0.2)
+            glPopMatrix()
             z_max+=0.9
             z_min+= 0.9
         x_max-=1.71
@@ -114,7 +130,9 @@ def montar_monitores():
     while(x_min > 0):
         z_max, z_min = 4.4, 3.82
         while(z_max < 6.4):
+            glPushMatrix()
             modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0, 0, 0)
+            glPopMatrix()
             z_max+=0.9
             z_min+= 0.9
         x_max-=1.71
@@ -125,18 +143,24 @@ def montar_monitores():
     while(x_min > 0):
         z_max, z_min = 4.58, 4.43
         while(z_max < 6.4):
+            glPushMatrix()
             modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.1, 0.1, 0.1)
+            glPopMatrix()
             z_max+=0.9
             z_min+= 0.9
         x_max-=1.71
         x_min-= 1.71
     
-    # botão power do lado direito
-    x_max, x_min, y_max, y_min = 6.245, 6.25001, 0.91, 0.9
+    # # botão power do lado direito
+    x_max, x_min, y_max, y_min = 6.25001, 6.245, 0.91, 0.9
+
     while(x_min > 0):
         z_max, z_min = 4.51, 4.49
         while(z_max < 6.4):
+            glPushMatrix()
+            turnOnPc.append({'x_max': x_max, 'x_min': (x_min), 'y_max': y_max, 'y_min': y_min, 'z_max': z_max, 'z_min': z_min, 'state': False})
             modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.35, 0.35, 0.35)
+            glPopMatrix()
             z_max+=0.9
             z_min+= 0.9
         x_max-=1.71
@@ -187,10 +211,11 @@ def montar_monitores():
         x_min-= 1.71
     
     # botão power do lado esquerdo
-    x_max, x_min, y_max, y_min = 6.245, 6.25001, 0.91, 0.9
+    x_max, x_min, y_max, y_min = 6.25001, 6.245, 0.91, 0.9
     while(x_min > 0):
         z_max, z_min = 1.9, 1.88
         while(z_max > 0):
+            turnOnPc.append({'x_max': x_max, 'x_min': (x_min), 'y_max': y_max, 'y_min': y_min, 'z_max': z_max, 'z_min': z_min, 'state': False})
             modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.35, 0.35, 0.35)
             z_max-=0.9
             z_min-= 0.9
@@ -441,6 +466,7 @@ def montar_teclado():
     for linha in range(4):
         for coluna in range(3):
             glPushMatrix()
+            glColor(1, 1, 1)
             glTranslatef(x*medida, y*medida, z*medida)
             glScale(0.4, 0.55, 0.35)
             glRotatef(-90, 0, 1, 0)
@@ -482,6 +508,39 @@ def montar_janela_da_porta():
         glVertex3f(janela[1] * medida, janela[3] * medida, janela[4] * medida)
         glEnd()
 
+def ligar_monitor():
+    global turnOnPc
+    for pc in turnOnPc:
+        if(pc['state'] and pc['z_max'] < 3.2):
+            # lado esquerdo
+            glPushMatrix()
+            glColor(1, 1, 1)
+            glTranslatef((pc['x_min']+0.2)*medida, (pc['y_max']+0.13) *medida, (pc['z_min']+0.41) *medida)
+            glScale(0.37, 0.84, 0.54)
+            glRotatef(90, 0, 1, 0)
+            glRotatef(-90, 1, 0, 0)
+            glCallList(objMonitorOn.gl_list)
+            glPopMatrix()
+        elif(pc['state'] and pc['z_max'] > 3.2):
+            # lado direito
+            glPushMatrix()
+            glColor(1, 1, 1)
+            glTranslatef((pc['x_min']+0.2)*medida, (pc['y_max']+0.13) *medida, (pc['z_min']-0.38) *medida)
+            glScale(0.37, 0.84, 0.54)
+            glRotatef(90, 0, 1, 0)
+            glRotatef(-90, 1, 0, 0)
+            glCallList(objMonitorOn.gl_list)
+            glPopMatrix()
+
+def ligar_pc():
+    global turnOnPc
+
+    for pc in turnOnPc:
+        if(pc['state']):
+            glPushMatrix()
+            modelar_objeto(pc['x_max'], pc['x_min'], pc['y_max'], pc['y_min'], pc['z_max'], pc['z_min'], 0, 1, 0)
+            glPopMatrix()
+
 def Draw():
     global medida, cx, cy, cz, fx, fy, fz, ux, uy, uz, anglePorta, angleVent, objTeclado
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -489,6 +548,10 @@ def Draw():
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
     gluLookAt(cx, cy, cz, cx + fx, cy + fy, cz + fz, ux, uy, uz)
+
+    glPushMatrix()
+    ligar_pc()
+    glPopMatrix()
 
     glPushMatrix()
     montar_paredes()
@@ -500,6 +563,10 @@ def Draw():
 
     glPushMatrix()
     montar_teclado()
+    glPopMatrix()
+
+    glPushMatrix()
+    ligar_monitor()
     glPopMatrix()
 
     glPushMatrix()
@@ -520,6 +587,8 @@ def Draw():
 
     glPushMatrix()  
     montar_bases_dos_ventiladores()
+    glPopMatrix()
+
     glPushMatrix()
     glTranslatef(5*medida, 2.875*medida, 3.2*medida)
     glRotatef(angleVent, 0, 1, 0)
@@ -530,7 +599,6 @@ def Draw():
     glTranslatef(2*medida, 2.875*medida, 3.2*medida)
     glRotatef(angleVent, 0, 1, 0)
     montar_ventilador()
-    glPopMatrix()
     glPopMatrix()
 
     glutSwapBuffers()
@@ -547,8 +615,28 @@ def myInit():
 def gerenciaMouse(button,state, x, y):
     global antigo_x, antigo_y
 
+    vport = glGetIntegerv(GL_VIEWPORT)
+    depth = glReadPixels(x, vport[3] - y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT)
+
+    vport      = glGetIntegerv(GL_VIEWPORT)
+    mvmatrix   = glGetDoublev(GL_MODELVIEW_MATRIX)
+    projmatrix = glGetDoublev(GL_PROJECTION_MATRIX)
+
+    worldCoordinate1 = gluUnProject(x, vport[3] - y, depth, mvmatrix, projmatrix, vport)
+
+    if state == 1:
+        for pc in turnOnPc:
+            if pc['x_max']*medida >= worldCoordinate1[0] >= ((pc['x_min']*medida) - 0.2) and pc['y_max']*medida >= worldCoordinate1[1] >= pc['y_min']*medida and pc['z_max']*medida >= worldCoordinate1[2] >= pc['z_min']*medida:
+                if pc['state']:
+                    pc['state'] = False
+                    break
+                else:
+                    pc['state'] = True
+                    break
+
     antigo_x = x
     antigo_y = y
+    glutPostRedisplay()
 
 def mouse_camera(mouse_x, mouse_y):
     global ang_x, ang_y, antigo_x, antigo_y, fx, fy, fz
@@ -566,7 +654,7 @@ def mouse_camera(mouse_x, mouse_y):
     glutPostRedisplay()
 
 def main():
-    global objTeclado
+    global objTeclado, objMonitorOn
 
     glutInit()
     glutInitWindowSize(1600, 1000)
@@ -575,6 +663,7 @@ def main():
     glutCreateWindow("lab 2")
     myInit()
     objTeclado = OBJ('ObjBlender/teclado.obj')
+    objMonitorOn = OBJ('ObjBlender/monitor.obj')
     glutDisplayFunc(Draw)
     glutKeyboardFunc(keyboard)
     glutMouseFunc(gerenciaMouse)
