@@ -541,6 +541,16 @@ def ligar_pc():
             modelar_objeto(pc['x_max'], pc['x_min'], pc['y_max'], pc['y_min'], pc['z_max'], pc['z_min'], 0, 1, 0)
             glPopMatrix()
 
+def montar_tomada():
+    x_max, x_min, y_max, y_min, z_max, z_min = 8, 7.99, 1.55, 1.35, 5.03, 4.97
+    modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.93,0.90,0.66)
+
+    x_max, x_min, y_max, y_min, z_max, z_min = 7.99, 7.985, 1.485, 1.465, 5.02, 4.98
+    modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.87,0.72,0.52)
+
+    x_max, x_min, y_max, y_min, z_max, z_min = 7.99, 7.985, 1.445, 1.425, 5.02, 4.98
+    modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.87,0.72,0.52)
+
 def Draw():
     global medida, cx, cy, cz, fx, fy, fz, ux, uy, uz, anglePorta, angleVent, objTeclado
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -548,6 +558,10 @@ def Draw():
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
     gluLookAt(cx, cy, cz, cx + fx, cy + fy, cz + fz, ux, uy, uz)
+
+    glPushMatrix()
+    montar_tomada()
+    glPopMatrix()
 
     glPushMatrix()
     ligar_pc()
