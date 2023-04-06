@@ -6,7 +6,7 @@ import math
 import time
 
 cx, cy, cz, fx, fy, fz, ux, uy, uz = 4, 10, 3.2, -4.18, -5.97, -3.38, 0, 1, 0
-anglePorta, angleVent, mouseSens, mouseVel, ang_x, ang_y = 0.0, 0.0, 0.001, 0.1, -1.2, 1
+angleJanela, anglePorta, angleVent, mouseSens, mouseVel, ang_x, ang_y = 0.0, 0.0, 0.0, 0.001, 0.1, -1.2, 1
 antigo_x, antigo_y, fAspect, rotX, rotY, obsZ, medida = 0, 0, 1.6, 0, -2, 2, 7
 objTeclado, objMonitorOn = '', ''
 turnOnPc = []
@@ -57,7 +57,7 @@ def modelar_objeto( x_max, x_min,  y_max, y_min,  z_max, z_min, colorR, colorG, 
     cubo(objeto[0], objeto[1], objeto[2], objeto[3], objeto[4], objeto[5], objeto[6], objeto[7], colorR, colorG, colorB)
 
 def keyboard(ch, x, y):
-    global cx, cy, cz, fx, fy, fz, ux, uy, uz, anglePorta, angleVent, turnOnPc
+    global cx, cy, cz, fx, fy, fz, ux, uy, uz, anglePorta, angleVent, turnOnPc, angleJanela
     ch = ch.decode("utf-8")
 
     if ch == 'r':
@@ -75,18 +75,17 @@ def keyboard(ch, x, y):
     elif ch == 'Y':
         cy -= 0.5
     elif ch == 'o':
-        if (anglePorta + 3 < 90):
+        if (anglePorta + 3 <= 90):
             anglePorta += 3
-    if ch == 'c':
+    elif ch == 'c':
         if (anglePorta - 3 >= 0):
             anglePorta -= 3
-    if ch == '1':
-        for pc in turnOnPc:
-            pc['state'] = True
-
-    if ch == '0':
-        for pc in turnOnPc:
-            pc['state'] = False
+    elif ch == 'j':
+        if (angleJanela+2 <= 90):
+            angleJanela += 2
+    elif ch == 'J':
+        if (angleJanela-2 >= 0):
+            angleJanela -= 2
 
     glutPostRedisplay()
 
@@ -287,8 +286,24 @@ def montar_paredes():
     x_max, x_min, y_max, y_min, z_max, z_min = 7, 6.85, 3, 0, 6.55, 5.55
     modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.75, 0.75, 0.75)
 
-    #parede esquerda
-    x_max, x_min, y_max, y_min, z_max, z_min = 8.15, -0.15, 3, 0, 0, -0.15
+    #parede esquerda inferior
+    x_max, x_min, y_max, y_min, z_max, z_min = 8.15, -0.15, 1.25, 0, 0, -0.15
+    modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.75, 0.75, 0.75)
+
+    # parede esquerda superior
+    x_max, x_min, y_max, y_min, z_max, z_min = 8.15, -0.15, 3, 2.95, 0, -0.15
+    modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.75, 0.75, 0.75)
+
+    # parede esquerda, lateral esquerda
+    x_max, x_min, y_max, y_min, z_max, z_min = 0.5, -0.15, 2.95, 1.25, 0, -0.15
+    modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.75, 0.75, 0.75)
+
+    # parede esquerda, lateral direita
+    x_max, x_min, y_max, y_min, z_max, z_min = 8.15, 7.8, 2.95, 1.25, 0, -0.15
+    modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.75, 0.75, 0.75)
+
+    # pilastra parede esquerda
+    x_max, x_min, y_max, y_min, z_max, z_min = 5.8, 5.5, 3, 0, 0.05, -0.15
     modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.75, 0.75, 0.75)
 
     #parede do fundo
@@ -442,17 +457,6 @@ def montar_ventilador():
     x_max, x_min, y_max, y_min, z_max, z_min = 0.05, -0.05, 0, 0,-0.5, 0.5
     modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0,0,0)
 
-
-
-def myInit():
-    glClearColor(0, 0, 0, 1)
-    glEnable(GL_DEPTH_TEST)
-
-    glMatrixMode(GL_PROJECTION)
-    glLoadIdentity()
-    glFrustum(-1, 1, -1, 1, 1, 100)
-    glMatrixMode(GL_MODELVIEW)
-
 def montar_teclado():
     # lado lideiro
     x, y, z = 6.2, 0.81, 4.05
@@ -556,6 +560,38 @@ def loop():
     
     glutPostRedisplay()
 
+def montar_janela_parede():
+    global medida
+    glPushMatrix()
+    glEnable(GL_BLEND)
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+    x_max, x_min, y_max, y_min, z_max, z_min = 0.215, -0.215, 0.815, -0.815, 0.005, -0.005
+    # modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.93,0.90,0.66)
+    glBegin(GL_QUADS)
+    glColor4f(192,192,192, 0.5) 
+    glVertex3f(x_max * medida, y_min * medida, 0 * medida)
+    glVertex3f(x_max * medida, y_max * medida, 0 * medida)
+    glVertex3f(x_min * medida, y_max * medida, 0 * medida)
+    glVertex3f(x_min * medida, y_min * medida, 0 * medida)
+    glEnd()
+    glPopMatrix()
+
+    # parte esquerda da janela
+    x_max, x_min, y_max, y_min, z_max, z_min = -0.215, -0.245, 0.85, -0.85, 0.005, -0.005
+    modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0,0,0)
+
+    # parte direita da janela
+    x_max, x_min, y_max, y_min, z_max, z_min = 0.245, 0.215, 0.85, -0.85, 0.005, -0.005
+    modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0,0,0)
+
+    # parte de cima da janela
+    x_max, x_min, y_max, y_min, z_max, z_min = 0.215, -0.215, 0.85, 0.815, 0.005, -0.005
+    modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0,0,0)
+
+    # parte de baixo da janela
+    x_max, x_min, y_max, y_min, z_max, z_min = 0.215, -0.215, -0.815, -0.85, 0.005, -0.005
+    modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0,0,0)
+
 def Draw():
     global medida, cx, cy, cz, fx, fy, fz, ux, uy, uz, anglePorta, angleVent, objTeclado
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -563,6 +599,25 @@ def Draw():
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
     gluLookAt(cx, cy, cz, cx + fx, cy + fy, cz + fz, ux, uy, uz)
+
+    glPushMatrix()
+    x_center, y_center, z_center = 0.75, 2.1, -0.075
+    for i in range(10):
+        glPushMatrix()
+        glTranslatef(x_center*medida, y_center*medida, z_center*medida)
+        glRotatef(angleJanela, 0, 1, 0)
+        montar_janela_parede()
+        glPopMatrix()
+        x_center+=0.5
+    x_center, y_center, z_center = 6.05, 2.1, -0.075
+    for i in range(4):
+        glPushMatrix()
+        glTranslatef(x_center*medida, y_center*medida, z_center*medida)
+        glRotatef(angleJanela, 0, 1, 0)
+        montar_janela_parede()
+        glPopMatrix()
+        x_center+=0.5
+    glPopMatrix()
 
     glPushMatrix()
     montar_tomada()
@@ -623,7 +678,7 @@ def Draw():
     glutSwapBuffers()
 
 def myInit():
-    glClearColor(0, 0, 0, 1)
+    glClearColor(0.73, 0.95, 0.97, 1)
     glEnable(GL_DEPTH_TEST)
 
     glMatrixMode(GL_PROJECTION)
