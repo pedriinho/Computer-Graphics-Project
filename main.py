@@ -10,6 +10,7 @@ anglePorta, angleVent, mouseSens, mouseVel, ang_x, ang_y = 0.0, 0.0, 0.001, 0.1,
 antigo_x, antigo_y, fAspect, rotX, rotY, obsZ, medida = 0, 0, 1.6, 0, -2, 2, 7
 objTeclado, objMonitorOn = '', ''
 turnOnPc = []
+turnSwitch = []
 
 def square(A, B, C, D):
     glBegin(GL_POLYGON)
@@ -79,14 +80,6 @@ def keyboard(ch, x, y):
     if ch == 'c':
         if (anglePorta - 3 >= 0):
             anglePorta -= 3
-    if ch == 'v':
-        angleVent += 15
-        if (angleVent >= 360):
-            angleVent = 0
-    if ch == 'V':
-        angleVent -= 15
-        if (angleVent <= 0):
-            angleVent = 360 
     if ch == '1':
         for pc in turnOnPc:
             pc['state'] = True
@@ -542,14 +535,26 @@ def ligar_pc():
             glPopMatrix()
 
 def montar_tomada():
+    global turnSwitch
     x_max, x_min, y_max, y_min, z_max, z_min = 8, 7.99, 1.55, 1.35, 5.03, 4.97
     modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.93,0.90,0.66)
 
     x_max, x_min, y_max, y_min, z_max, z_min = 7.99, 7.985, 1.485, 1.465, 5.02, 4.98
+    turnSwitch.append({'x_max': x_max, 'x_min': x_min, 'y_max': y_max, 'y_min': y_min, 'z_max': z_max, 'z_min': z_min, 'state': False})
     modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.87,0.72,0.52)
 
     x_max, x_min, y_max, y_min, z_max, z_min = 7.99, 7.985, 1.445, 1.425, 5.02, 4.98
     modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.87,0.72,0.52)
+
+def loop():
+    global angleVent, turnSwitch
+
+    if turnSwitch[0]['state']:
+        angleVent += 15
+        if(angleVent >= 360):
+            angleVent = 0
+    
+    glutPostRedisplay()
 
 def Draw():
     global medida, cx, cy, cz, fx, fy, fz, ux, uy, uz, anglePorta, angleVent, objTeclado
@@ -648,6 +653,15 @@ def gerenciaMouse(button,state, x, y):
                     pc['state'] = True
                     break
 
+        for switch in turnSwitch:
+            if switch['x_max']*medida >= worldCoordinate1[0] >= ((switch['x_min']*medida) - 0.2) and switch['y_max']*medida >= worldCoordinate1[1] >= switch['y_min']*medida and switch['z_max']*medida >= worldCoordinate1[2] >= switch['z_min']*medida:
+                if switch['state']:
+                    switch['state'] = False
+                    break
+                else:
+                    switch['state'] = True
+                    break
+
     antigo_x = x
     antigo_y = y
     glutPostRedisplay()
@@ -679,6 +693,7 @@ def main():
     objTeclado = OBJ('ObjBlender/teclado.obj')
     objMonitorOn = OBJ('ObjBlender/monitor.obj')
     glutDisplayFunc(Draw)
+    glutIdleFunc(loop)
     glutKeyboardFunc(keyboard)
     glutMouseFunc(gerenciaMouse)
     glutMotionFunc(mouse_camera)
