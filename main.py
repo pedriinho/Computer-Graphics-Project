@@ -5,9 +5,9 @@ from OpenGL.GLUT import *
 import math
 import time
 
-cx, cy, cz, fx, fy, fz, ux, uy, uz = 4, 10, 3.2, -4.18, -5.97, -3.38, 0, 1, 0
-angleJanela, anglePorta, angleVent, mouseSens, mouseVel, ang_x, ang_y = 0.0, 0.0, 0.0, 0.001, 0.1, -1.2, 1
-antigo_x, antigo_y, fAspect, rotX, rotY, obsZ, medida = 0, 0, 1.6, 0, -2, 2, 7
+angleJanela, anglePorta, angleVent, mouseSens, mouseVel, ang_x, ang_y = 0.0, 0.0, 0.0, 0.001, 0.1, 0.3, 1.3
+antigo_x, antigo_y, fAspect, rotX, rotY, obsZ, medida = 710, 519, 1.6, 0, -2, 2, 7
+cx, cy, cz, fx, fy, fz, ux, uy, uz = 0.3*medida, 1.3*medida, 3.2*medida, 0.98, 0.16, -0.05, 0, 1, 0
 objTeclado, objMonitorOn = '', ''
 turnOnPc = []
 turnSwitch = []
@@ -20,25 +20,25 @@ def square(A, B, C, D):
     glVertex3fv(D)
     glEnd()
 
-def cubo(t0, t1, t2, t3, t4, t5, t6, t7, colorR, colorG, colorB):
+def cubo(v0, v1, v2, v3, v4, v5, v6, v7, colorR, colorG, colorB):
     glPushMatrix()
     glColor3f(colorR, colorG, colorB)
-    square(t0, t1, t2, t3)
+    square(v0, v1, v2, v3)
 
     glColor3f(colorR, colorG, colorB)
-    square(t4, t5, t6, t7)
+    square(v4, v5, v6, v7)
 
     glColor3f(colorR, colorG, colorB)
-    square(t0, t4, t7, t3)
+    square(v0, v4, v7, v3)
 
     glColor3f(colorR, colorG, colorB)
-    square(t1, t5, t6, t2)
+    square(v1, v5, v6, v2)
 
     glColor3f(colorR, colorG, colorB)
-    square(t3, t2, t6, t7)
+    square(v3, v2, v6, v7)
 
     glColor3f(colorR, colorG, colorB)
-    square(t0, t1, t5, t4)
+    square(v0, v1, v5, v4)
     glPopMatrix()
 
 def modelar_objeto( x_max, x_min,  y_max, y_min,  z_max, z_min, colorR, colorG, colorB):
@@ -277,9 +277,21 @@ def montar_paredes():
     #teto
     x_max, x_min, y_max, y_min, z_max, z_min = 8.15, -0.15, 3.15, 3, 6.55, -0.15
     modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.5, 0.5, 0.5)
-    
-    #parede direita, lado da porta
-    x_max, x_min, y_max, y_min, z_max, z_min = 7, -0.15, 3, 0, 6.55, 6.4
+
+    # parede direita inferior
+    x_max, x_min, y_max, y_min, z_max, z_min = 7, -0.15, 2.5, 0, 6.55, 6.4
+    modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.75, 0.75, 0.75)
+
+    # pilastra parede direita
+    x_max, x_min, y_max, y_min, z_max, z_min = 5.8, 5.5, 3, 0, 6.55, 6.35
+    modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.75, 0.75, 0.75)
+
+    # parede direita, lado esquerdo
+    x_max, x_min, y_max, y_min, z_max, z_min = 6.85, 6.8, 3, 2.5, 6.55, 6.4
+    modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.75, 0.75, 0.75)
+
+    # parede direita, lado direito
+    x_max, x_min, y_max, y_min, z_max, z_min = 0.5, 0, 3, 2.5, 6.55, 6.4
     modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.75, 0.75, 0.75)
 
     #parede menor a direita, lado da porta
@@ -487,7 +499,7 @@ def montar_teclado():
         x-=1.71
         z = 2.25
 
-def montar_janela_da_porta():
+def montar_janela_lado_direito():
     global medida
 
     vertices = [
@@ -504,7 +516,25 @@ def montar_janela_da_porta():
         glVertex3f(janela[1] * medida, janela[2] * medida, janela[4] * medida)
         glVertex3f(janela[1] * medida, janela[3] * medida, janela[4] * medida)
         glEnd()
+    
+    x_center, y_center, z_center = 6.05, 2.75, 6.475
+    for i in range(2):
+        glPushMatrix()
+        glTranslatef(x_center*medida, y_center*medida, z_center*medida)
+        glRotatef(angleJanela, 0, 1, 0)
+        montar_janela_de_movimento(0.5, 0.5)
+        glPopMatrix()
+        x_center+=0.5
 
+    x_center, y_center, z_center = 0.75, 2.75, 6.475
+    for i in range(10):
+        glPushMatrix()
+        glTranslatef(x_center*medida, y_center*medida, z_center*medida)
+        glRotatef(angleJanela, 0, 1, 0)
+        montar_janela_de_movimento(0.5, 0.5)
+        glPopMatrix()
+        x_center+=0.5
+    
 def ligar_monitor():
     global turnOnPc
     for pc in turnOnPc:
@@ -560,12 +590,12 @@ def loop():
     
     glutPostRedisplay()
 
-def montar_janela_parede():
+def montar_janela_de_movimento(tam_x, tam_y):
     global medida
     glPushMatrix()
     glEnable(GL_BLEND)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-    x_max, x_min, y_max, y_min, z_max, z_min = 0.215, -0.215, 0.815, -0.815, 0.005, -0.005
+    x_max, x_min, y_max, y_min, z_max, z_min = -0.035 + (tam_x/2), 0.035 - (tam_x/2), -0.035 + (tam_y/2), 0.035 - (tam_y/2), 0.005, -0.005
     # modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.93,0.90,0.66)
     glBegin(GL_QUADS)
     glColor4f(192,192,192, 0.5) 
@@ -577,19 +607,19 @@ def montar_janela_parede():
     glPopMatrix()
 
     # parte esquerda da janela
-    x_max, x_min, y_max, y_min, z_max, z_min = -0.215, -0.245, 0.85, -0.85, 0.005, -0.005
+    x_max, x_min, y_max, y_min, z_max, z_min = 0.035 - (tam_x/2), 0.005 - (tam_x/2), (tam_y/2), -(tam_y/2), 0.005, -0.005
     modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0,0,0)
 
     # parte direita da janela
-    x_max, x_min, y_max, y_min, z_max, z_min = 0.245, 0.215, 0.85, -0.85, 0.005, -0.005
+    x_max, x_min, y_max, y_min, z_max, z_min = -0.005 + (tam_x/2), -0.035 + (tam_x/2), (tam_y/2), -(tam_y/2), 0.005, -0.005
     modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0,0,0)
 
     # parte de cima da janela
-    x_max, x_min, y_max, y_min, z_max, z_min = 0.215, -0.215, 0.85, 0.815, 0.005, -0.005
+    x_max, x_min, y_max, y_min, z_max, z_min = -0.035 + (tam_x/2), 0.035 - (tam_x/2), (tam_y/2), -0.035 + (tam_y/2), 0.005, -0.005
     modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0,0,0)
 
     # parte de baixo da janela
-    x_max, x_min, y_max, y_min, z_max, z_min = 0.215, -0.215, -0.815, -0.85, 0.005, -0.005
+    x_max, x_min, y_max, y_min, z_max, z_min = -0.035 + (tam_x/2), 0.035 - (tam_x/2), 0.035 - (tam_y/2), -(tam_y/2), 0.005, -0.005
     modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0,0,0)
 
 def Draw():
@@ -606,15 +636,16 @@ def Draw():
         glPushMatrix()
         glTranslatef(x_center*medida, y_center*medida, z_center*medida)
         glRotatef(angleJanela, 0, 1, 0)
-        montar_janela_parede()
+        montar_janela_de_movimento(0.5, 1.7)
         glPopMatrix()
         x_center+=0.5
+
     x_center, y_center, z_center = 6.05, 2.1, -0.075
     for i in range(4):
         glPushMatrix()
         glTranslatef(x_center*medida, y_center*medida, z_center*medida)
         glRotatef(angleJanela, 0, 1, 0)
-        montar_janela_parede()
+        montar_janela_de_movimento(0.5, 1.7)
         glPopMatrix()
         x_center+=0.5
     glPopMatrix()
@@ -646,7 +677,7 @@ def Draw():
     glPushMatrix()
     glEnable(GL_BLEND)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-    montar_janela_da_porta()
+    montar_janela_lado_direito()
     glPopMatrix()
 
     glPushMatrix()  
