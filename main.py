@@ -11,6 +11,7 @@ cx, cy, cz, fx, fy, fz, ux, uy, uz = 0.3*medida, 1.3*medida, 3.2*medida, 0.98, 0
 objTeclado, objMonitorOn = '', ''
 turnOnPc = []
 turnSwitch = []
+turnLamp = []
 
 def square(A, B, C, D):
     glBegin(GL_POLYGON)
@@ -569,7 +570,7 @@ def ligar_pc():
             glPopMatrix()
 
 def montar_tomada():
-    global turnSwitch
+    global turnSwitch, turnLamp
     x_max, x_min, y_max, y_min, z_max, z_min = 8, 7.99, 1.55, 1.35, 5.03, 4.97
     modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.93,0.90,0.66)
 
@@ -578,6 +579,7 @@ def montar_tomada():
     modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.87,0.72,0.52)
 
     x_max, x_min, y_max, y_min, z_max, z_min = 7.99, 7.985, 1.445, 1.425, 5.02, 4.98
+    turnLamp.append({'x_max': x_max, 'x_min': x_min, 'y_max': y_max, 'y_min': y_min, 'z_max': z_max, 'z_min': z_min, 'state': False})
     modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.87,0.72,0.52)
 
 def loop():
@@ -622,13 +624,71 @@ def montar_janela_de_movimento(tam_x, tam_y):
     x_max, x_min, y_max, y_min, z_max, z_min = -0.035 + (tam_x/2), 0.035 - (tam_x/2), 0.035 - (tam_y/2), -(tam_y/2), 0.005, -0.005
     modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0,0,0)
 
+def montar_lampadas(colorR, colorG, colorB):
+    x, y, z = 5, 2.95, 4.8
+    for lado_direiro in range(3):
+        # apoio da lampada
+        x_max, x_min, y_max, y_min, z_max, z_min = x, x-0.1, 3, 2.88, z+0.1, z-0.05
+        modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0,0,0)
+
+        x_max, x_min, y_max, y_min, z_max, z_min = x+1.1, x+1, 3, 2.88, z+0.1, z-0.05
+        modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0,0,0)
+
+        for par in range(2):
+            glPushMatrix()
+            glTranslatef(x*medida, y*medida, z*medida) # Define a posição do cilindro
+            glRotatef(90, 0, 1, 0) # Rotaciona o cilindro
+            glColor3f(colorR, colorG, colorB) # Define a cor do cilindro
+            quad = gluNewQuadric() # Cria um novo objeto quadric
+            gluQuadricDrawStyle(quad, GLU_FILL) # Define o estilo de desenho
+            gluCylinder(quad, 0.15, 0.15, 1*medida, 32, 32) # Desenha o cilindro
+            glPopMatrix()
+            z+=0.05
+        
+        x-=2
+        z = 4.8
+
+    x, y, z = 5, 2.95, 1.6
+    for lado_esquerdo in range(3):
+        # apoio da lampada
+        x_max, x_min, y_max, y_min, z_max, z_min = x, x-0.1, 3, 2.88, z+0.1, z-0.05
+        modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0,0,0)
+
+        x_max, x_min, y_max, y_min, z_max, z_min = x+1.1, x+1, 3, 2.88, z+0.1, z-0.05
+        modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0,0,0)
+
+        for par in range(2):
+            glPushMatrix()
+            glTranslatef(x*medida, y*medida, z*medida) # Define a posição do cilindro
+            glRotatef(90, 0, 1, 0) # Rotaciona o cilindro
+            glColor3f(colorR, colorG, colorB) # Define a cor do cilindro
+            quad = gluNewQuadric() # Cria um novo objeto quadric
+            gluQuadricDrawStyle(quad, GLU_FILL) # Define o estilo de desenho
+            gluCylinder(quad, 0.15, 0.15, 1*medida, 32, 32) # Desenha o cilindro
+            glPopMatrix()
+            z+=0.05
+        
+        x-=2
+        z = 1.6
+
 def Draw():
-    global medida, cx, cy, cz, fx, fy, fz, ux, uy, uz, anglePorta, angleVent, objTeclado
+    global medida, cx, cy, cz, fx, fy, fz, ux, uy, uz, anglePorta, angleVent, objTeclado, turnLamp
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
     gluLookAt(cx, cy, cz, cx + fx, cy + fy, cz + fz, ux, uy, uz)
+
+    glPushMatrix()
+    montar_tomada()
+    glPopMatrix()
+
+    glPushMatrix()
+    if turnLamp[0]['state']:
+        montar_lampadas(0.9, 0.9, 0.9)
+    else:
+        montar_lampadas(0.3, 0.3, 0.3)
+    glPopMatrix()
 
     glPushMatrix()
     x_center, y_center, z_center = 0.75, 2.1, -0.075
@@ -648,10 +708,6 @@ def Draw():
         montar_janela_de_movimento(0.5, 1.7)
         glPopMatrix()
         x_center+=0.5
-    glPopMatrix()
-
-    glPushMatrix()
-    montar_tomada()
     glPopMatrix()
 
     glPushMatrix()
@@ -746,6 +802,15 @@ def gerenciaMouse(button,state, x, y):
                     break
                 else:
                     switch['state'] = True
+                    break
+
+        for lamp in turnLamp:
+            if lamp['x_max']*medida >= worldCoordinate1[0] >= ((lamp['x_min']*medida) - 0.2) and lamp['y_max']*medida >= worldCoordinate1[1] >= lamp['y_min']*medida and lamp['z_max']*medida >= worldCoordinate1[2] >= lamp['z_min']*medida:
+                if lamp['state']:
+                    lamp['state'] = False
+                    break
+                else:
+                    lamp['state'] = True
                     break
 
     antigo_x = x
