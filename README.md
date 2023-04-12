@@ -19,4 +19,4 @@
 ## Ações dentro do lab
 
 - Cada PC tem seu próprio gabinete com um botão power, ao clicar no botão, o PC irá ligar/desligar, a depender do seu estado atual.
-- Ao lado da porta, dentro da sala, existe 2 interruptores, o primeiro liga/desliga o ventilado, a depender de seu estado atual, e o segundo liga/desliga as lâmpadas, a depender do seu estado atual.
+- Ao lado da porta, dentro da sala, existem 2 interruptores, o primeiro liga/desliga o ventilador, a depender de seu estado atual, e o segundo liga/desliga as lâmpadas, a depender do seu estado atual.
