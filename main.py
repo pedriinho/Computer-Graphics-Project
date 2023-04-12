@@ -62,7 +62,7 @@ def keyboard(ch, x, y):
     ch = ch.decode("utf-8")
 
     if ch == 'r':
-        cx, cy, cz, fx, fy, fz, ux, uy, uz = 4, 10, 3.2, -4.18, -5.97, -3.38, 0, 1, 0
+        cx, cy, cz, fx, fy, fz, ux, uy, uz = 0.3*medida, 1.3*medida, 3.2*medida, 0.98, 0.16, -0.05, 0, 1, 0
     elif ch == 'a':
         cz -= 0.5
     elif ch == 'd':
@@ -511,7 +511,7 @@ def montar_janela_lado_direito():
 
     for janela in vertices:
         glBegin(GL_QUADS)
-        glColor4f(192,192,192, 0.5) 
+        glColor4f(0.75,0.75,0.75, 0.5) 
         glVertex3f(janela[0] * medida, janela[3] * medida, janela[4] * medida)
         glVertex3f(janela[0] * medida, janela[2] * medida, janela[4] * medida)
         glVertex3f(janela[1] * medida, janela[2] * medida, janela[4] * medida)
@@ -600,7 +600,7 @@ def montar_janela_de_movimento(tam_x, tam_y):
     x_max, x_min, y_max, y_min, z_max, z_min = -0.035 + (tam_x/2), 0.035 - (tam_x/2), -0.035 + (tam_y/2), 0.035 - (tam_y/2), 0.005, -0.005
     # modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.93,0.90,0.66)
     glBegin(GL_QUADS)
-    glColor4f(192,192,192, 0.5) 
+    glColor4f(0.75,0.75,0.75, 0.5) 
     glVertex3f(x_max * medida, y_min * medida, 0 * medida)
     glVertex3f(x_max * medida, y_max * medida, 0 * medida)
     glVertex3f(x_min * medida, y_max * medida, 0 * medida)
@@ -691,26 +691,6 @@ def Draw():
     glPopMatrix()
 
     glPushMatrix()
-    x_center, y_center, z_center = 0.75, 2.1, -0.075
-    for i in range(10):
-        glPushMatrix()
-        glTranslatef(x_center*medida, y_center*medida, z_center*medida)
-        glRotatef(angleJanela, 0, 1, 0)
-        montar_janela_de_movimento(0.5, 1.7)
-        glPopMatrix()
-        x_center+=0.5
-
-    x_center, y_center, z_center = 6.05, 2.1, -0.075
-    for i in range(4):
-        glPushMatrix()
-        glTranslatef(x_center*medida, y_center*medida, z_center*medida)
-        glRotatef(angleJanela, 0, 1, 0)
-        montar_janela_de_movimento(0.5, 1.7)
-        glPopMatrix()
-        x_center+=0.5
-    glPopMatrix()
-
-    glPushMatrix()
     ligar_pc()
     glPopMatrix()
 
@@ -734,6 +714,26 @@ def Draw():
     glEnable(GL_BLEND)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
     montar_janela_lado_direito()
+    glPopMatrix()
+
+    glPushMatrix()
+    x_center, y_center, z_center = 0.75, 2.1, -0.075
+    for i in range(10):
+        glPushMatrix()
+        glTranslatef(x_center*medida, y_center*medida, z_center*medida)
+        glRotatef(angleJanela, 0, 1, 0)
+        montar_janela_de_movimento(0.5, 1.7)
+        glPopMatrix()
+        x_center+=0.5
+
+    x_center, y_center, z_center = 6.05, 2.1, -0.075
+    for i in range(4):
+        glPushMatrix()
+        glTranslatef(x_center*medida, y_center*medida, z_center*medida)
+        glRotatef(angleJanela, 0, 1, 0)
+        montar_janela_de_movimento(0.5, 1.7)
+        glPopMatrix()
+        x_center+=0.5
     glPopMatrix()
 
     glPushMatrix()  
