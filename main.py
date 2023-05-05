@@ -631,8 +631,19 @@ def montar_lampadas(colorR, colorG, colorB):
         x_max, x_min, y_max, y_min, z_max, z_min = x, x-0.1, 3, 2.88, z+0.1, z-0.05
         modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0,0,0)
 
+        position = [x_max - x_min, y_max-y_min, z_max-z_min, 0.0]  # negative z-direction
+        color = [colorR, colorG, colorB, 1.0]  # white
+        glLightfv(GL_LIGHT0, GL_POSITION, position*medida)
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, color)
+
         x_max, x_min, y_max, y_min, z_max, z_min = x+1.1, x+1, 3, 2.88, z+0.1, z-0.05
         modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0,0,0)
+        
+        position = [x_max - x_min, y_max-y_min, z_max-z_min, 0.0]  # negative z-direction
+        color = [colorR, colorG, colorB, 1.0]  # white
+        glLightfv(GL_LIGHT0, GL_POSITION, position*medida)
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, color)
+
 
         for par in range(2):
             glPushMatrix()
@@ -654,8 +665,18 @@ def montar_lampadas(colorR, colorG, colorB):
         x_max, x_min, y_max, y_min, z_max, z_min = x, x-0.1, 3, 2.88, z+0.1, z-0.05
         modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0,0,0)
 
+        position = [x_max - x_min, y_max-y_min, z_max-z_min, 0.0]  # negative z-direction
+        color = [colorR, colorG, colorB, 1.0]  # white
+        glLightfv(GL_LIGHT0, GL_POSITION, position*medida)
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, color)
+
         x_max, x_min, y_max, y_min, z_max, z_min = x+1.1, x+1, 3, 2.88, z+0.1, z-0.05
         modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0,0,0)
+
+        position = [x_max - x_min, y_max-y_min, z_max-z_min, 0.0]  # negative z-direction
+        color = [colorR, colorG, colorB, 1.0]  # white
+        glLightfv(GL_LIGHT0, GL_POSITION, position*medida)
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, color)
 
         for par in range(2):
             glPushMatrix()
@@ -767,6 +788,10 @@ def Draw():
 def myInit():
     glClearColor(0.73, 0.95, 0.97, 1)
     glEnable(GL_DEPTH_TEST)
+
+    glEnable(GL_LIGHTING)
+    glEnable(GL_LIGHT0)
+    glEnable(GL_COLOR_MATERIAL)
 
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
