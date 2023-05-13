@@ -575,6 +575,10 @@ def ligar_pc():
             modelar_objeto(pc['x_max'], pc['x_min'], pc['y_max'], pc['y_min'], pc['z_max'], pc['z_min'], 0, 1, 0)
             glPopMatrix()
 
+def setup_lamp():
+    x_max, x_min, y_max, y_min, z_max, z_min = 7.99, 7.985, 1.445, 1.425, 5.02, 4.98
+    turnLamp.append({'x_max': x_max, 'x_min': x_min, 'y_max': y_max, 'y_min': y_min, 'z_max': z_max, 'z_min': z_min, 'state': False})
+
 def montar_tomada():
     global turnSwitch, turnLamp
     x_max, x_min, y_max, y_min, z_max, z_min = 8, 7.99, 1.55, 1.35, 5.03, 4.97
@@ -585,7 +589,6 @@ def montar_tomada():
     modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.87,0.72,0.52)
 
     x_max, x_min, y_max, y_min, z_max, z_min = 7.99, 7.985, 1.445, 1.425, 5.02, 4.98
-    turnLamp.append({'x_max': x_max, 'x_min': x_min, 'y_max': y_max, 'y_min': y_min, 'z_max': z_max, 'z_min': z_min, 'state': False})
     modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.87,0.72,0.52)
 
 def loop():
@@ -637,7 +640,39 @@ def montar_janela_de_movimento(tam_x, tam_y):
     x_max, x_min, y_max, y_min, z_max, z_min = -0.035 + (tam_x/2), 0.035 - (tam_x/2), 0.035 - (tam_y/2), -(tam_y/2), 0.005, -0.005
     modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0,0,0)
 
+def habilitar_spot():
+    glEnable(GL_LIGHT1)
+    luz(4.5, 3, 5, GL_LIGHT1)
+
+    glEnable(GL_LIGHT2)
+    luz(2.5, 3, 5, GL_LIGHT2)
+    
+    glEnable(GL_LIGHT3)
+    luz(0.5, 3, 5, GL_LIGHT3)
+
+    glEnable(GL_LIGHT4)
+    luz(4.5, 3, 1.6, GL_LIGHT4)
+
+    glEnable(GL_LIGHT5)
+    luz(2.5, 3, 1.6, GL_LIGHT5)
+    
+    glEnable(GL_LIGHT6)
+    luz(0.5, 3, 1.6, GL_LIGHT6)
+
+def desabilitar_spot():
+    glDisable(GL_LIGHT1)
+    glDisable(GL_LIGHT2)
+    glDisable(GL_LIGHT3)
+    glDisable(GL_LIGHT4)
+    glDisable(GL_LIGHT5)
+    glDisable(GL_LIGHT6)
+
 def montar_lampadas(colorR, colorG, colorB):
+    if turnLamp[0]['state']:
+        habilitar_spot()
+    else:
+        desabilitar_spot()
+
     x, y, z = 5, 2.95, 4.8
     for lado_direiro in range(3):
         # apoio da lampada
@@ -684,9 +719,31 @@ def montar_lampadas(colorR, colorG, colorB):
         x-=2
         z = 1.6
 
+
+def luz(x, y, z, type_luz):
+    glLightfv(type_luz, GL_POSITION, [x * medida, y*medida, z*medida, 1])
+    glLightfv(type_luz, GL_SPOT_DIRECTION, [0.0, -1.0, 0.0])
+    glLightfv(type_luz, GL_DIFFUSE, [1, 1, 1, 1])
+    glLightfv(type_luz, GL_SPECULAR, [0.5, 0.5, 0.5, 1])
+    glLightf(type_luz, GL_SPOT_CUTOFF, 90)
+    glLightf(type_luz, GL_SPOT_EXPONENT, 1)
+    
+    glLightf(type_luz, GL_CONSTANT_ATTENUATION, 1)
+    glLightf(type_luz, GL_LINEAR_ATTENUATION, 0.01)
+    if not isDay:
+        glLightf(type_luz, GL_QUADRATIC_ATTENUATION, 0.005)
+    else:
+        glLightf(type_luz, GL_QUADRATIC_ATTENUATION, 0.025)
+
 def Draw():
+    setup_lamp()
     global medida, cx, cy, cz, fx, fy, fz, ux, uy, uz, anglePorta, angleVent, objTeclado, turnLamp
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT, [1.0, 1.0, 1.0, 1.0])
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, [1.0, 1.0, 1.0, 1.0])
+    glMaterialfv(GL_FRONT, GL_SPECULAR, [0.1, 0.1, 0.1, 1])
+    glMaterialfv(GL_FRONT, GL_SHININESS, 10.0)
 
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
@@ -700,15 +757,16 @@ def Draw():
     montar_teclado()
     glPopMatrix()
 
-    glPushMatrix()
-    montar_tomada()
-    glPopMatrix()
 
     glPushMatrix()
     if turnLamp[0]['state']:
-        montar_lampadas(0.9, 0.9, 0.9)
+        montar_lampadas(1, 1, 1)
     else:
         montar_lampadas(0.3, 0.3, 0.3)
+    glPopMatrix()
+
+    glPushMatrix()
+    montar_tomada()
     glPopMatrix()
 
     glPushMatrix()
@@ -781,10 +839,6 @@ def myInit():
     glClearColor(0.73, 0.95, 0.97, 1)
     glEnable(GL_DEPTH_TEST)
 
-    glEnable(GL_LIGHTING)
-    glEnable(GL_LIGHT0)
-    glEnable(GL_COLOR_MATERIAL)
-
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
     glFrustum(-1, 1, -1, 1, 1, 100)
@@ -853,7 +907,15 @@ def mouse_camera(mouse_x, mouse_y):
 def setup_lighting():
     glEnable(GL_COLOR_MATERIAL)
     glEnable(GL_LIGHTING)
+
     glEnable(GL_LIGHT0)
+    glEnable(GL_LIGHT1)
+    glEnable(GL_LIGHT2)
+    glEnable(GL_LIGHT3)
+    glEnable(GL_LIGHT4)
+    glEnable(GL_LIGHT5)
+    glEnable(GL_LIGHT6)
+
     glShadeModel(GL_SMOOTH)
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE)
 
