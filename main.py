@@ -9,6 +9,7 @@ angleJanela, anglePorta, angleVent, mouseSens, mouseVel, ang_x, ang_y = 0.0, 0.0
 antigo_x, antigo_y, fAspect, rotX, rotY, obsZ, medida = 710, 519, 1.6, 0, -2, 2, 7
 cx, cy, cz, fx, fy, fz, ux, uy, uz = 0.3*medida, 1.3*medida, 3.2*medida, 0.98, 0.16, -0.05, 0, 1, 0
 objTeclado, objMonitorOn = '', ''
+isDay = False
 turnOnPc = []
 turnSwitch = []
 turnLamp = []
@@ -58,7 +59,7 @@ def modelar_objeto( x_max, x_min,  y_max, y_min,  z_max, z_min, colorR, colorG, 
     cubo(objeto[0], objeto[1], objeto[2], objeto[3], objeto[4], objeto[5], objeto[6], objeto[7], colorR, colorG, colorB)
 
 def keyboard(ch, x, y):
-    global cx, cy, cz, fx, fy, fz, ux, uy, uz, anglePorta, angleVent, turnOnPc, angleJanela
+    global cx, cy, cz, fx, fy, fz, ux, uy, uz, anglePorta, angleVent, turnOnPc, angleJanela, isDay
     ch = ch.decode("utf-8")
 
     if ch == 'r':
@@ -87,6 +88,11 @@ def keyboard(ch, x, y):
     elif ch == 'J':
         if (angleJanela-2 >= 0):
             angleJanela -= 2
+    elif ch == 't':
+        isDay = not isDay
+    elif ch == 'e':
+        turnLamp[0]['state'] = not turnLamp[0]['state']
+
 
     glutPostRedisplay()
 
@@ -542,7 +548,7 @@ def ligar_monitor():
         if(pc['state'] and pc['z_max'] < 3.2):
             # lado esquerdo
             glPushMatrix()
-            glColor(1, 1, 1)
+            glColor3f(1, 1, 1)
             glTranslatef((pc['x_min']+0.2)*medida, (pc['y_max']+0.13) *medida, (pc['z_min']+0.41) *medida)
             glScale(0.37, 0.84, 0.54)
             glRotatef(90, 0, 1, 0)
@@ -552,7 +558,7 @@ def ligar_monitor():
         elif(pc['state'] and pc['z_max'] > 3.2):
             # lado direito
             glPushMatrix()
-            glColor(1, 1, 1)
+            glColor3f(1, 1, 1)
             glTranslatef((pc['x_min']+0.2)*medida, (pc['y_max']+0.13) *medida, (pc['z_min']-0.38) *medida)
             glScale(0.37, 0.84, 0.54)
             glRotatef(90, 0, 1, 0)
@@ -590,6 +596,14 @@ def loop():
         if(angleVent >= 360):
             angleVent = 0
     
+    if isDay:
+        glClearColor(0.73, 0.95, 0.97, 1)
+        glLightModelfv(GL_LIGHT_MODEL_AMBIENT, [0.5, 0.5, 0.5, 1])
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, [0, 0, 0, 1])
+    else:
+        glClearColor(0, 0, 0.1, 1)
+        glLightModelfv(GL_LIGHT_MODEL_AMBIENT, [0.15, 0.15, 0.15, 1])
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, [0, 0, 0, 1])
     glutPostRedisplay()
 
 def montar_janela_de_movimento(tam_x, tam_y):
@@ -598,7 +612,6 @@ def montar_janela_de_movimento(tam_x, tam_y):
     glEnable(GL_BLEND)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
     x_max, x_min, y_max, y_min, z_max, z_min = -0.035 + (tam_x/2), 0.035 - (tam_x/2), -0.035 + (tam_y/2), 0.035 - (tam_y/2), 0.005, -0.005
-    # modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.93,0.90,0.66)
     glBegin(GL_QUADS)
     glColor4f(0.75,0.75,0.75, 0.5) 
     glVertex3f(x_max * medida, y_min * medida, 0 * medida)
@@ -631,19 +644,8 @@ def montar_lampadas(colorR, colorG, colorB):
         x_max, x_min, y_max, y_min, z_max, z_min = x, x-0.1, 3, 2.88, z+0.1, z-0.05
         modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0,0,0)
 
-        position = [x_max - x_min, y_max-y_min, z_max-z_min, 0.0]  # negative z-direction
-        color = [colorR, colorG, colorB, 1.0]  # white
-        glLightfv(GL_LIGHT0, GL_POSITION, position*medida)
-        glLightfv(GL_LIGHT0, GL_DIFFUSE, color)
-
         x_max, x_min, y_max, y_min, z_max, z_min = x+1.1, x+1, 3, 2.88, z+0.1, z-0.05
         modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0,0,0)
-        
-        position = [x_max - x_min, y_max-y_min, z_max-z_min, 0.0]  # negative z-direction
-        color = [colorR, colorG, colorB, 1.0]  # white
-        glLightfv(GL_LIGHT0, GL_POSITION, position*medida)
-        glLightfv(GL_LIGHT0, GL_DIFFUSE, color)
-
 
         for par in range(2):
             glPushMatrix()
@@ -665,18 +667,8 @@ def montar_lampadas(colorR, colorG, colorB):
         x_max, x_min, y_max, y_min, z_max, z_min = x, x-0.1, 3, 2.88, z+0.1, z-0.05
         modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0,0,0)
 
-        position = [x_max - x_min, y_max-y_min, z_max-z_min, 0.0]  # negative z-direction
-        color = [colorR, colorG, colorB, 1.0]  # white
-        glLightfv(GL_LIGHT0, GL_POSITION, position*medida)
-        glLightfv(GL_LIGHT0, GL_DIFFUSE, color)
-
         x_max, x_min, y_max, y_min, z_max, z_min = x+1.1, x+1, 3, 2.88, z+0.1, z-0.05
         modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0,0,0)
-
-        position = [x_max - x_min, y_max-y_min, z_max-z_min, 0.0]  # negative z-direction
-        color = [colorR, colorG, colorB, 1.0]  # white
-        glLightfv(GL_LIGHT0, GL_POSITION, position*medida)
-        glLightfv(GL_LIGHT0, GL_DIFFUSE, color)
 
         for par in range(2):
             glPushMatrix()
@@ -701,6 +693,14 @@ def Draw():
     gluLookAt(cx, cy, cz, cx + fx, cy + fy, cz + fz, ux, uy, uz)
 
     glPushMatrix()
+    ligar_monitor()
+    glPopMatrix()
+
+    glPushMatrix()
+    montar_teclado()
+    glPopMatrix()
+
+    glPushMatrix()
     montar_tomada()
     glPopMatrix()
 
@@ -721,14 +721,6 @@ def Draw():
     montar_monitores()
     montar_quadro()
     montar_estruturas_da_porta()
-    glPopMatrix()
-
-    glPushMatrix()
-    montar_teclado()
-    glPopMatrix()
-
-    glPushMatrix()
-    ligar_monitor()
     glPopMatrix()
 
     glPushMatrix()
@@ -857,6 +849,15 @@ def mouse_camera(mouse_x, mouse_y):
 
     glutPostRedisplay()
 
+
+def setup_lighting():
+    glEnable(GL_COLOR_MATERIAL)
+    glEnable(GL_LIGHTING)
+    glEnable(GL_LIGHT0)
+    glShadeModel(GL_SMOOTH)
+    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE)
+
+
 def main():
     global objTeclado, objMonitorOn
 
@@ -869,6 +870,7 @@ def main():
     myInit()
     objTeclado = OBJ('ObjBlender/teclado.obj')
     objMonitorOn = OBJ('ObjBlender/monitor.obj')
+    setup_lighting()
     glutDisplayFunc(Draw)
     glutIdleFunc(loop)
     glutKeyboardFunc(keyboard)
