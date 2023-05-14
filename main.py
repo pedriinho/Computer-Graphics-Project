@@ -669,6 +669,7 @@ def desabilitar_spot():
 
 def montar_lampadas(colorR, colorG, colorB):
     if turnLamp[0]['state']:
+        glLightModelfv(GL_LIGHT_MODEL_AMBIENT, [0.55, 0.55,0.55, 1.0])
         habilitar_spot()
     else:
         desabilitar_spot()
@@ -731,7 +732,7 @@ def luz(x, y, z, type_luz):
     glLightf(type_luz, GL_CONSTANT_ATTENUATION, 1)
     glLightf(type_luz, GL_LINEAR_ATTENUATION, 0.01)
     if not isDay:
-        glLightf(type_luz, GL_QUADRATIC_ATTENUATION, 0.005)
+        glLightf(type_luz, GL_QUADRATIC_ATTENUATION, 0.025)
     else:
         glLightf(type_luz, GL_QUADRATIC_ATTENUATION, 0.025)
 
