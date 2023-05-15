@@ -9,7 +9,7 @@ angleJanela, anglePorta, angleVent, mouseSens, mouseVel, ang_x, ang_y = 0.0, 0.0
 antigo_x, antigo_y, fAspect, rotX, rotY, obsZ, medida = 710, 519, 1.6, 0, -2, 2, 7
 cx, cy, cz, fx, fy, fz, ux, uy, uz = 0.3*medida, 1.3*medida, 3.2*medida, 0.98, 0.16, -0.05, 0, 1, 0
 objTeclado, objMonitorOn = '', ''
-isDay = False
+isDay = True
 turnOnPc = []
 turnSwitch = []
 turnLamp = []
@@ -669,7 +669,8 @@ def desabilitar_spot():
 
 def montar_lampadas(colorR, colorG, colorB):
     if turnLamp[0]['state']:
-        glLightModelfv(GL_LIGHT_MODEL_AMBIENT, [0.55, 0.55,0.55, 1.0])
+        if not isDay:
+            glLightModelfv(GL_LIGHT_MODEL_AMBIENT, [0.25, 0.25,0.25, 1.0])
         habilitar_spot()
     else:
         desabilitar_spot()
@@ -726,15 +727,15 @@ def luz(x, y, z, type_luz):
     glLightfv(type_luz, GL_SPOT_DIRECTION, [0.0, -1.0, 0.0])
     glLightfv(type_luz, GL_DIFFUSE, [1, 1, 1, 1])
     glLightfv(type_luz, GL_SPECULAR, [0.5, 0.5, 0.5, 1])
-    glLightf(type_luz, GL_SPOT_CUTOFF, 90)
+    glLightf(type_luz, GL_SPOT_CUTOFF, 180)
     glLightf(type_luz, GL_SPOT_EXPONENT, 1)
     
     glLightf(type_luz, GL_CONSTANT_ATTENUATION, 1)
     glLightf(type_luz, GL_LINEAR_ATTENUATION, 0.01)
     if not isDay:
-        glLightf(type_luz, GL_QUADRATIC_ATTENUATION, 0.025)
+        glLightf(type_luz, GL_QUADRATIC_ATTENUATION, 0.02)
     else:
-        glLightf(type_luz, GL_QUADRATIC_ATTENUATION, 0.025)
+        glLightf(type_luz, GL_QUADRATIC_ATTENUATION, 0.035)
 
 def Draw():
     setup_lamp()
