@@ -4,6 +4,7 @@ from OpenGL.GLU import *
 from OpenGL.GLUT import *
 import math
 import time
+from PIL import Image
 
 angleJanela, anglePorta, angleVent, mouseSens, mouseVel, ang_x, ang_y = 0.0, 0.0, 0.0, 0.001, 0.1, 0.3, 1.3
 antigo_x, antigo_y, fAspect, rotX, rotY, obsZ, medida = 710, 519, 1.6, 0, -2, 2, 7
@@ -12,7 +13,9 @@ objTeclado, objMonitorOn = '', ''
 isDay = True
 turnOnPc = []
 turnSwitch = []
-turnLamp = []
+turnLampPc = False
+turnLampRoof = []
+texture_board, texture_fan, texture_floor = 0, 0, 0
 
 def square(A, B, C, D):
     glBegin(GL_POLYGON)
@@ -59,23 +62,23 @@ def modelar_objeto( x_max, x_min,  y_max, y_min,  z_max, z_min, colorR, colorG, 
     cubo(objeto[0], objeto[1], objeto[2], objeto[3], objeto[4], objeto[5], objeto[6], objeto[7], colorR, colorG, colorB)
 
 def keyboard(ch, x, y):
-    global cx, cy, cz, fx, fy, fz, ux, uy, uz, anglePorta, angleVent, turnOnPc, angleJanela, isDay
+    global cx, cy, cz, fx, fy, fz, ux, uy, uz, anglePorta, angleVent, turnOnPc, angleJanela, isDay, turnLampPc
     ch = ch.decode("utf-8")
 
     if ch == 'r':
         cx, cy, cz, fx, fy, fz, ux, uy, uz = 0.3*medida, 1.3*medida, 3.2*medida, 0.98, 0.16, -0.05, 0, 1, 0
     elif ch == 'a':
-        cz -= 0.5
+        cz -= 2
     elif ch == 'd':
-        cz += 0.5
+        cz += 2
     elif ch == 'w':
-        cx += 0.5
+        cx += 2
     elif ch == 's':
-        cx -= 0.5
+        cx -= 2
     elif ch == 'y':
-        cy += 0.5
+        cy += 2
     elif ch == 'Y':
-        cy -= 0.5
+        cy -= 2
     elif ch == 'o':
         if (anglePorta + 3 <= 90):
             anglePorta += 3
@@ -91,7 +94,9 @@ def keyboard(ch, x, y):
     elif ch == 't':
         isDay = not isDay
     elif ch == 'e':
-        turnLamp[0]['state'] = not turnLamp[0]['state']
+        turnLampPc = not turnLampPc
+    elif ch == 'q':
+        turnLampRoof[0]['state'] = not turnLampRoof[0]['state']
 
 
     glutPostRedisplay()
@@ -280,6 +285,11 @@ def montar_paredes():
     #piso
     x_max, x_min, y_max, y_min, z_max, z_min = 8.15, -0.15, 0, -0.15, 6.55, -0.15
     modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.5, 0.5, 0.5)
+    glPushMatrix()
+    glTranslatef(8*medida, -8.1495*medida, 0)
+    glRotatef(90, 0, 0, 1)
+    montar_textura(x_max, x_min, y_max, y_min+8.3, z_max, z_min, texture_floor)
+    glPopMatrix()
 
     #teto
     x_max, x_min, y_max, y_min, z_max, z_min = 8.15, -0.15, 3.15, 3, 6.55, -0.15
@@ -333,9 +343,44 @@ def montar_paredes():
     x_max, x_min, y_max, y_min, z_max, z_min = 8.15, 8, 3, 0, 6.55, -0.15
     modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.75, 0.75, 0.75)
 
+def montar_textura(x_max, x_min,  y_max, y_min, z_max, z_min, texture ):
+    glEnable(GL_TEXTURE_2D)
+    glBindTexture(GL_TEXTURE_2D, texture)
+    
+    glColor3f(1, 1, 1)
+    
+    if(x_min == 0):
+        glBegin(GL_QUADS)
+        glTexCoord2f(0, 0)
+        glVertex3f(x_max*medida, y_max*medida, z_max*medida)
+        glTexCoord2f(1, 0)
+        glVertex3f(x_max*medida, y_max*medida, z_min*medida)
+        glTexCoord2f(1, 1)
+        glVertex3f(x_max*medida, y_min*medida, z_min*medida)
+        glTexCoord2f(0, 1)
+        glVertex3f(x_max*medida, y_min*medida, z_max*medida)
+        glEnd()
+    else:
+        glBegin(GL_QUADS)
+        glTexCoord2f(0, 0)
+        glVertex3f(x_max*medida, y_max*medida, z_max*medida)
+        glTexCoord2f(1, 0)
+        glVertex3f(x_max*medida, y_max*medida, z_min*medida)
+        glTexCoord2f(1, 1)
+        glVertex3f(x_max*medida, y_min*medida, z_min*medida)
+        glTexCoord2f(0, 1)
+        glVertex3f(x_max*medida, y_min*medida, z_max*medida)
+        glEnd()
+        
+
+    glDisable(GL_TEXTURE_2D)
+
 def montar_quadro():
+    global texture_board
     x_max, x_min, y_max, y_min, z_max, z_min = 8, 7.98, 2.44, 0.71, 4, 1.55
     modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.87, 0.87, 0.87)
+    montar_textura(7.97995, 0, y_max, y_min, z_max, z_min, texture_board)
+    
 
 def montar_estruturas_da_porta():
     #estrutura da porta solta da parede
@@ -469,12 +514,23 @@ def montar_bases_dos_ventiladores():
 
 
 def montar_ventilador():
+    global texture_fan
     #ventilador 1
     x_max, x_min, y_max, y_min, z_max, z_min = -0.5, 0.5, 0, 0, 0.05, -0.05
     modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0,0,0)
+    glPushMatrix()
+    glRotatef(-90, 0, 0, 1)
+    montar_textura(x_max+0.51, x_min, y_max+0.5, y_min-0.5, z_max, z_min, texture_fan)
+    glPopMatrix()
 
     x_max, x_min, y_max, y_min, z_max, z_min = 0.05, -0.05, 0, 0,-0.5, 0.5
     modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0,0,0)
+    glPushMatrix()
+    glTranslatef(0, 0.045*medida, 0)
+    glRotatef(-90, 0, 0, 1)
+    montar_textura(x_max, x_min, y_max+0.05, y_min-0.05, z_max, z_min, texture_fan)
+    glPopMatrix()
+
 
 def montar_teclado():
     # lado lideiro
@@ -577,7 +633,7 @@ def ligar_pc():
 
 def setup_lamp():
     x_max, x_min, y_max, y_min, z_max, z_min = 7.99, 7.985, 1.445, 1.425, 5.02, 4.98
-    turnLamp.append({'x_max': x_max, 'x_min': x_min, 'y_max': y_max, 'y_min': y_min, 'z_max': z_max, 'z_min': z_min, 'state': False})
+    turnLampRoof.append({'x_max': x_max, 'x_min': x_min, 'y_max': y_max, 'y_min': y_min, 'z_max': z_max, 'z_min': z_min, 'state': False})
 
 def montar_tomada():
     global turnSwitch, turnLamp
@@ -641,40 +697,46 @@ def montar_janela_de_movimento(tam_x, tam_y):
     modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0,0,0)
 
 def habilitar_spot():
-    glEnable(GL_LIGHT1)
-    luz(4.5, 3, 5, GL_LIGHT1)
+    if turnLampPc:
+        glEnable(GL_LIGHT1)
+        luz(6.34, 1.45, 4.125, GL_LIGHT1, 90, 0.2)
 
-    glEnable(GL_LIGHT2)
-    luz(2.5, 3, 5, GL_LIGHT2)
+        glEnable(GL_LIGHT2)
+        luz(6.34, 1.45, 5.025, GL_LIGHT2, 90 , 0.2)
+        
+        glEnable(GL_LIGHT3)
+        luz(6.34, 1.45, 5.925, GL_LIGHT3, 90, 0.2)
+
+        glEnable(GL_LIGHT4)
+        luz(6.34, 1.45, 2.305, GL_LIGHT4, 90, 0.2)
+
+        glEnable(GL_LIGHT5)
+        luz(6.34, 1.45, 1.405, GL_LIGHT5, 90, 0.2)
+        
+        glEnable(GL_LIGHT6)
+        luz(6.34, 1.45, 0.505, GL_LIGHT6, 90, 0.2)
     
-    glEnable(GL_LIGHT3)
-    luz(0.5, 3, 5, GL_LIGHT3)
-
-    glEnable(GL_LIGHT4)
-    luz(4.5, 3, 1.6, GL_LIGHT4)
-
-    glEnable(GL_LIGHT5)
-    luz(2.5, 3, 1.6, GL_LIGHT5)
-    
-    glEnable(GL_LIGHT6)
-    luz(0.5, 3, 1.6, GL_LIGHT6)
+    if turnLampRoof[0]['state']:
+        glEnable(GL_LIGHT7)
+        luz(2.5, 3, 3.2, GL_LIGHT7, 180, 0.005)
+        if not isDay:
+            glLightfv(GL_LIGHT7, GL_AMBIENT, [0.25, 0.25, 0.25, 1])
+        else:
+            glLightfv(GL_LIGHT7, GL_AMBIENT, [0.05, 0.05, 0.05, 1])
+        
 
 def desabilitar_spot():
-    glDisable(GL_LIGHT1)
-    glDisable(GL_LIGHT2)
-    glDisable(GL_LIGHT3)
-    glDisable(GL_LIGHT4)
-    glDisable(GL_LIGHT5)
-    glDisable(GL_LIGHT6)
+    if not turnLampPc:
+        glDisable(GL_LIGHT1)
+        glDisable(GL_LIGHT2)
+        glDisable(GL_LIGHT3)
+        glDisable(GL_LIGHT4)
+        glDisable(GL_LIGHT5)
+        glDisable(GL_LIGHT6)
+    if not turnLampRoof[0]['state']:
+        glDisable(GL_LIGHT7)
 
 def montar_lampadas(colorR, colorG, colorB):
-    if turnLamp[0]['state']:
-        if not isDay:
-            glLightModelfv(GL_LIGHT_MODEL_AMBIENT, [0.25, 0.25,0.25, 1.0])
-        habilitar_spot()
-    else:
-        desabilitar_spot()
-
     x, y, z = 5, 2.95, 4.8
     for lado_direiro in range(3):
         # apoio da lampada
@@ -722,20 +784,107 @@ def montar_lampadas(colorR, colorG, colorB):
         z = 1.6
 
 
-def luz(x, y, z, type_luz):
+def luz(x, y, z, type_luz, angle, clarity):
     glLightfv(type_luz, GL_POSITION, [x * medida, y*medida, z*medida, 1])
     glLightfv(type_luz, GL_SPOT_DIRECTION, [0.0, -1.0, 0.0])
     glLightfv(type_luz, GL_DIFFUSE, [1, 1, 1, 1])
     glLightfv(type_luz, GL_SPECULAR, [0.5, 0.5, 0.5, 1])
-    glLightf(type_luz, GL_SPOT_CUTOFF, 180)
+    glLightf(type_luz, GL_SPOT_CUTOFF, angle)
     glLightf(type_luz, GL_SPOT_EXPONENT, 1)
     
     glLightf(type_luz, GL_CONSTANT_ATTENUATION, 1)
     glLightf(type_luz, GL_LINEAR_ATTENUATION, 0.01)
-    if not isDay:
-        glLightf(type_luz, GL_QUADRATIC_ATTENUATION, 0.02)
-    else:
-        glLightf(type_luz, GL_QUADRATIC_ATTENUATION, 0.035)
+    glLightf(type_luz, GL_QUADRATIC_ATTENUATION, clarity)
+
+def montar_luminaria(r, g, b):
+    #  lado direito
+    x_max, x_min, y_max, y_min, z_max, z_min = 6.58, 6.56, 1.515, 0.815, 4.135,4.115
+    while(z_max < 6.4):
+        glPushMatrix()
+        modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.2, 0.2, 0.2)
+        glPopMatrix()
+        z_max+=0.9
+        z_min+= 0.9
+    
+    x_max, x_min, y_max, y_min, z_max, z_min = 6.58, 6.35, 1.53, 1.515, 4.135,4.115
+    while(z_max < 6.4):
+        glPushMatrix()
+        modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.2, 0.2, 0.2)
+        glPopMatrix()
+        z_max+=0.9
+        z_min+= 0.9
+
+    x_max, x_min, y_max, y_min, z_max, z_min = 6.35, 6.33, 1.53, 1.45, 4.135,4.115
+    while(z_max < 6.4):
+        glPushMatrix()
+        modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.2, 0.2, 0.2)
+        glPopMatrix()
+        z_max+=0.9
+        z_min+= 0.9
+    
+    x_max, x_min, y_max, y_min, z_max, z_min = 6.37, 6.31, 1.48, 1.42, 4.155,4.095
+    while(z_max < 6.4):
+        glPushMatrix()
+        modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.2, 0.2, 0.2)
+        glPopMatrix()
+        glPushMatrix()
+        glTranslatef(((x_max+x_min)/2)*medida, y_min*medida, ((z_max+z_min)/2)*medida)
+        glColor3f(r, g, b)
+        glutSolidSphere(0.15, 50, 50)
+        glPopMatrix()
+        z_max+=0.9
+        z_min+= 0.9
+
+    # lado esquerdo
+    x_max, x_min, y_max, y_min, z_max, z_min = 6.58, 6.56, 1.515, 0.815, 2.315, 2.295
+    while(z_max > 0):
+        glPushMatrix()
+        modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.2, 0.2, 0.2)
+        glPopMatrix()
+        z_max-=0.9
+        z_min-= 0.9
+    
+    x_max, x_min, y_max, y_min, z_max, z_min = 6.58, 6.35, 1.53, 1.515, 2.315, 2.295
+    while(z_max > 0):
+        glPushMatrix()
+        modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.2, 0.2, 0.2)
+        glPopMatrix()
+        z_max-=0.9
+        z_min-= 0.9
+
+    x_max, x_min, y_max, y_min, z_max, z_min = 6.35, 6.33, 1.53, 1.45, 2.315, 2.295
+    while(z_max > 0):
+        glPushMatrix()
+        modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.2, 0.2, 0.2)
+        glPopMatrix()
+        z_max-=0.9
+        z_min-= 0.9
+    
+    x_max, x_min, y_max, y_min, z_max, z_min = 6.37, 6.31, 1.48, 1.42, 2.335, 2.275
+    while(z_max > 0):
+        glPushMatrix()
+        modelar_objeto(x_max, x_min, y_max, y_min, z_max, z_min, 0.2, 0.2, 0.2)
+        glPopMatrix()
+        glPushMatrix()
+        glTranslatef(((x_max+x_min)/2)*medida, y_min*medida, ((z_max+z_min)/2)*medida)
+        glColor3f(r, g, b)
+        glutSolidSphere(0.15, 50, 50)
+        glPopMatrix()
+        z_max-=0.9
+        z_min-= 0.9
+
+def load_texture(filename):
+    image = Image.open(filename)
+    width, height = image.size
+    image_data = image.tobytes()
+
+    texture_id = glGenTextures(1)
+    glBindTexture(GL_TEXTURE_2D, texture_id)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image_data)
+
+    return texture_id
 
 def Draw():
     setup_lamp()
@@ -761,10 +910,17 @@ def Draw():
 
 
     glPushMatrix()
-    if turnLamp[0]['state']:
+    if not turnLampPc:
+        montar_luminaria(0.4, 0.4, 0.4)
+    else:
+        montar_luminaria(1, 1, 1)
+        
+    if turnLampRoof[0]['state']:
         montar_lampadas(1, 1, 1)
     else:
         montar_lampadas(0.3, 0.3, 0.3)
+    habilitar_spot()
+    desabilitar_spot()
     glPopMatrix()
 
     glPushMatrix()
@@ -782,7 +938,7 @@ def Draw():
     montar_quadro()
     montar_estruturas_da_porta()
     glPopMatrix()
-
+    
     glPushMatrix()
     glEnable(GL_BLEND)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
@@ -877,7 +1033,7 @@ def gerenciaMouse(button,state, x, y):
                     switch['state'] = True
                     break
 
-        for lamp in turnLamp:
+        for lamp in turnLampRoof:
             if lamp['x_max']*medida >= worldCoordinate1[0] >= ((lamp['x_min']*medida) - 0.2) and lamp['y_max']*medida >= worldCoordinate1[1] >= lamp['y_min']*medida and lamp['z_max']*medida >= worldCoordinate1[2] >= lamp['z_min']*medida:
                 if lamp['state']:
                     lamp['state'] = False
@@ -911,6 +1067,9 @@ def setup_lighting():
     glEnable(GL_LIGHTING)
 
     glEnable(GL_LIGHT0)
+    glEnable(GL_LIGHT7)
+
+    # luz no pc
     glEnable(GL_LIGHT1)
     glEnable(GL_LIGHT2)
     glEnable(GL_LIGHT3)
@@ -918,12 +1077,14 @@ def setup_lighting():
     glEnable(GL_LIGHT5)
     glEnable(GL_LIGHT6)
 
+
+
     glShadeModel(GL_SMOOTH)
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE)
 
 
 def main():
-    global objTeclado, objMonitorOn
+    global objTeclado, objMonitorOn, texture_board, texture_fan, texture_floor
 
     glutInit()
     glutInitWindowSize(1600, 1000)
@@ -932,6 +1093,9 @@ def main():
     glutCreateWindow("lab 2")
     glEnable(GL_MULTISAMPLE)
     myInit()
+    texture_board = load_texture("texture/board.jpg")
+    texture_fan = load_texture("texture/fan.jpg")
+    texture_floor = load_texture("texture/floor.jpeg")
     objTeclado = OBJ('ObjBlender/teclado.obj')
     objMonitorOn = OBJ('ObjBlender/monitor.obj')
     setup_lighting()
