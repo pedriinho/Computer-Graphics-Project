@@ -1,22 +1,42 @@
-# Computer-Graphics-Project
+# 💻 Computer Graphics Project
 
-## Comandos do teclado
+## 🎮 Controles de Teclado
+Movimentação da Câmera:
 
-- **w**: move a câmera para frente, em torno do eixo X
-- **s**: move a câmera para trás, em torno do eixo X
-- **a**: move a câmera para a esquerda, em torno do eixo Z
-- **d**: move a câmera para a direira, em torno do eixo Z
-- **y**: move a câmera para cima, em torno do eixo Y
-- **Y**: move a câmera para baixo, em torno do eixo Y
-- **o**: abre a porta
-- **c**: fecha a porta
-- **j**: abre a janela
-- **J**: fecha a janela
+- **w** – Mover para frente (eixo X)
 
-**É importante citar que as janelas e a porta, estão limitadas a mover entre 0° e 90°.**
+- **s** – Mover para trás (eixo X)
 
+- **a** – Mover para a esquerda (eixo Z)
 
-## Ações dentro do lab
+- **dd** – Mover para a direita (eixo Z)
 
-- Cada PC tem seu próprio gabinete com um botão power, ao clicar no botão, o PC irá ligar/desligar, a depender do seu estado atual.
-- Ao lado da porta, dentro da sala, existem 2 interruptores, o primeiro liga/desliga o ventilador, a depender de seu estado atual, e o segundo liga/desliga as lâmpadas, a depender do seu estado atual.
+- **Y** – Mover para cima (eixo Y)
+
+- **Shift + y** – Mover para baixo (eixo Y)
+
+Interação com o Ambiente:
+
+- **o** – Abrir a porta
+
+- **c** – Fechar a porta
+
+- **j** – Abrir a janela
+
+- **Shift + j** – Fechar a janela
+
+**⚠️ As janelas e a porta possuem limites de rotação entre 0° e 90°.**
+
+## 🏢 Ações Interativas no Laboratório
+### 💡 Equipamentos:
+- **Gabinetes dos PCs**
+    - Cada computador possui seu próprio botão power.
+
+    → Clique para ligar/desligar conforme o estado atual.
+
+### 🔘 Interruptores (ao lado da porta):
+- **Ventilador**
+    - → Liga/desliga o ventilador.
+
+- **Iluminação**
+    - → Liga/desliga as lâmpadas.
